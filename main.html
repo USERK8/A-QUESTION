@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yes or No Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        #question {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        button {
+            font-size: 18px;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+        #yes {
+            background-color: green;
+            color: white;
+        }
+        #no {
+            background-color: red;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div id="question">Do you like this game?</div>
+    <div class="button-container">
+        <button id="yes" onclick="endGame()">Yes</button>
+        <button id="no" onclick="increaseYesSize()">No</button>
+    </div>
+
+    <script>
+        let yesButton = document.getElementById("yes");
+        let noButton = document.getElementById("no");
+        let sizeMultiplier = 1;
+
+        function endGame() {
+            alert("Great choice! The game ends here.");
+        }
+
+        function increaseYesSize() {
+            sizeMultiplier *= 1.5;
+            yesButton.style.fontSize = `${sizeMultiplier * 18}px`;
+            yesButton.style.padding = `${sizeMultiplier * 10}px ${sizeMultiplier * 20}px`;
+            
+            if (sizeMultiplier > 5) {
+                noButton.style.display = "none";
+            }
+        }
+    </script>
+</body>
+</html>
