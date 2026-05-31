@@ -1,64 +1,246 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Yes or No Game</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin-top: 50px;
-        }
-        #question {
-            font-size: 24px;
-            margin-bottom: 20px;
-        }
-        .button-container {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-        }
-        button {
-            font-size: 18px;
-            padding: 10px 20px;
-            cursor: pointer;
-        }
-        #yes {
-            background-color: green;
-            color: white;
-        }
-        #no {
-            background-color: red;
-            color: white;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>a question for you</title>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      background: #0e0810;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Lora', Georgia, serif;
+      overflow: hidden;
+    }
+
+    .hearts-bg {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 0;
+    }
+
+    .fh {
+      position: absolute;
+      opacity: 0;
+      animation: floatHeart linear infinite;
+    }
+
+    @keyframes floatHeart {
+      0%   { opacity: 0; transform: translateY(0) scale(0.6); }
+      10%  { opacity: 0.35; }
+      80%  { opacity: 0.15; }
+      100% { opacity: 0; transform: translateY(-100vh) scale(1); }
+    }
+
+    .card {
+      position: relative;
+      z-index: 1;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 24px;
+      padding: 56px 48px;
+      max-width: 480px;
+      width: calc(100% - 40px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 36px;
+      text-align: center;
+    }
+
+    .question {
+      font-size: clamp(1.25rem, 5vw, 1.7rem);
+      font-style: italic;
+      font-weight: 400;
+      color: #f5e6f0;
+      line-height: 1.7;
+    }
+
+    .btn-area {
+      position: relative;
+      width: 100%;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-yes {
+      background: #c2496f;
+      color: #fff;
+      border: none;
+      border-radius: 50px;
+      font-family: 'Lora', Georgia, serif;
+      font-weight: 600;
+      font-size: 18px;
+      padding: 14px 40px;
+      cursor: pointer;
+      transition: transform 0.15s, background 0.2s;
+      position: relative;
+      z-index: 2;
+    }
+
+    .btn-yes:hover { transform: scale(1.06); background: #d4537e; }
+
+    .btn-no {
+      background: transparent;
+      color: rgba(255,255,255,0.3);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 50px;
+      font-family: 'Lora', Georgia, serif;
+      font-size: 13px;
+      padding: 9px 20px;
+      cursor: pointer;
+      position: absolute;
+      transition: color 0.2s;
+      white-space: nowrap;
+    }
+
+    .btn-no:hover { color: rgba(255,255,255,0.55); }
+
+    .pity {
+      font-style: italic;
+      font-size: 13px;
+      color: rgba(255,255,255,0.35);
+      min-height: 20px;
+      transition: opacity 0.3s;
+    }
+
+    .result {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .result-emoji {
+      font-size: 60px;
+      animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    }
+
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.2); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+
+    .result-text {
+      font-size: clamp(1.1rem, 4vw, 1.5rem);
+      font-style: italic;
+      color: #f5e6f0;
+      line-height: 1.7;
+    }
+
+    .result-sub {
+      font-size: 13px;
+      color: rgba(255,255,255,0.4);
+    }
+  </style>
 </head>
 <body>
-    <div id="question">WILL YOU BE MY VALENTINE?</div>
-    <div class="button-container">
-        <button id="yes" onclick="endGame()">Yes</button>
-        <button id="no" onclick="increaseYesSize()">No</button>
+
+  <div class="hearts-bg" id="heartsBg"></div>
+
+  <div class="card">
+
+    <div id="mainContent" style="display:flex;flex-direction:column;align-items:center;gap:36px;width:100%;">
+      <div class="question">
+        i've been meaning to ask you something for a while now…<br>will you be my valentine?
+      </div>
+
+      <div class="btn-area">
+        <div id="btnWrap" style="position:relative;width:100%;height:64px;display:flex;align-items:center;justify-content:center;">
+          <button class="btn-yes" id="yesBtn" onclick="onYes()">Yes</button>
+          <button class="btn-no"  id="noBtn"  onclick="onNo()" style="left:calc(50% + 90px);top:16px;">No</button>
+        </div>
+      </div>
+
+      <div class="pity" id="pityMsg"></div>
     </div>
 
-    <script>
-        let yesButton = document.getElementById("yes");
-        let noButton = document.getElementById("no");
-        let sizeMultiplier = 1;
+    <div class="result" id="resultWrap">
+      <div class="result-emoji">💕</div>
+      <div class="result-text">this just made everything better.</div>
+      <div class="result-sub">now go celebrate 🥂</div>
+    </div>
 
-        function endGame() {
-            alert("THANK YOU VERY MUCH...");
-        }
+  </div>
 
-        function increaseYesSize() {
-            sizeMultiplier *= 1.5;
-            yesButton.style.fontSize = `${sizeMultiplier * 18}px`;
-            yesButton.style.padding = `${sizeMultiplier * 10}px ${sizeMultiplier * 20}px`;
-            
-            if (sizeMultiplier > 5) {
-                noButton.style.display = "none";
-            }
-        }
-    </script>
+  <script>
+    const pityLines = [
+      "are you sure though…",
+      "really? not even a little?",
+      "the yes button is right there…",
+      "okay but just think about it",
+      "…still no? wow.",
+      "the yes button really misses you",
+      "okay fine, take your time",
+      "…",
+      "you can't run forever 😄",
+    ];
+
+    let noCount = 0;
+    let sizeScale = 1;
+    const noBtn   = document.getElementById('noBtn');
+    const yesBtn  = document.getElementById('yesBtn');
+    const pityMsg = document.getElementById('pityMsg');
+    const heartsBg = document.getElementById('heartsBg');
+
+    const symbols = ['🌹','💕','✨','🌸','💖','🫶','💗'];
+    for (let i = 0; i < 18; i++) {
+      const h = document.createElement('div');
+      h.className = 'fh';
+      h.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+      h.style.left = Math.random() * 100 + 'vw';
+      h.style.bottom = '-30px';
+      h.style.fontSize = (14 + Math.random() * 14) + 'px';
+      h.style.animationDuration = (10 + Math.random() * 12) + 's';
+      h.style.animationDelay   = (Math.random() * 14) + 's';
+      heartsBg.appendChild(h);
+    }
+
+    function onNo() {
+      noCount++;
+      sizeScale *= 1.45;
+      yesBtn.style.fontSize = Math.min(sizeScale * 18, 68) + 'px';
+      yesBtn.style.padding  = Math.min(sizeScale * 14, 44) + 'px ' + Math.min(sizeScale * 40, 110) + 'px';
+      pityMsg.textContent = pityLines[Math.min(noCount - 1, pityLines.length - 1)];
+
+      if (noCount >= pityLines.length) {
+        noBtn.style.display = 'none';
+        pityMsg.textContent = "looks like the no button gave up 🌹";
+      } else {
+        const nx = (Math.random() - 0.5) * 140;
+        const ny = (Math.random() - 0.5) * 36 - 8;
+        noBtn.style.left = `calc(50% + ${90 + nx}px)`;
+        noBtn.style.top  = (16 + ny) + 'px';
+      }
+    }
+
+    function onYes() {
+      document.getElementById('mainContent').style.display = 'none';
+      const r = document.getElementById('resultWrap');
+      r.style.display = 'flex';
+      const burst = ['🌹','💕','✨','🌸','💖','🎉','💗'];
+      for (let i = 0; i < 35; i++) {
+        const h = document.createElement('div');
+        h.className = 'fh';
+        h.textContent = burst[Math.floor(Math.random() * burst.length)];
+        h.style.left = Math.random() * 100 + 'vw';
+        h.style.bottom = '-30px';
+        h.style.fontSize = (14 + Math.random() * 20) + 'px';
+        h.style.animationDuration = (4 + Math.random() * 5) + 's';
+        h.style.animationDelay   = (Math.random() * 2) + 's';
+        heartsBg.appendChild(h);
+      }
+    }
+  </script>
+
 </body>
 </html>
